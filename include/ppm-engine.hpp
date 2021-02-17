@@ -80,6 +80,8 @@ namespace ppm {
 	void image_s::set_dimensions(uint32_t width, uint32_t height){
 		this->width = width;
 		this->height = height;
+
+		image = std::vector<std::vector<pixel_t>>(height, std::vector<pixel_t>(width));
 	}
 	void image_s::set_filename(const char* filename){
 		this->filename = filename;
@@ -184,6 +186,7 @@ namespace ppm {
 	}
 
 	void image_s::compile(){
+		
 		this->compile(this->filename);
 	}
 	
