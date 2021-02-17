@@ -1,0 +1,8 @@
+//draws a little tree
+
+NAME{tree.ppm}
+SIZE{2560,1440}
+FILL{0,0,64}
+RECT{1180,900,1380,1440,165,100,6}
+CIRCLE{1280,700,500,0,255,0}
+END

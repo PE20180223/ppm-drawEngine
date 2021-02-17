@@ -1,13 +1,20 @@
-#include "ppm-engine.hpp"
+#include "parser.hpp"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv){
 
-	ppm::Image* Tree = new ppm::Image(2560, 1440);
+	/*
+		Commandline Arguments: ppmparser <input_filename>
+	*/
+	if(argc != 2){
+		std::cerr << "bad format, should be: ppmparser <input_filename>\n";
+		return -1;
+	}
 
-	Tree->fill(ppm::VERY_DARK_BLUE);
-	Tree->drawRect(1180, 900, 1380, 1440, ppm::BROWN);
-	Tree->drawCircle(1280, 700, 500, ppm::GREEN);
-	Tree->compile("tree.ppm");
+	const char* input_file = argv[1];
 
+	ppm::parser_s parser = ppm::parser_s();
+
+	parser.read_file(input_file);
+	parser.create_image();
 	return 0;
 }
