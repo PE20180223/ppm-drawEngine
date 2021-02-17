@@ -9,27 +9,28 @@
 #define MAX_RGB 255
 
 /*
-	Authors: Elias Plank
-	Co-Author: Elias Gierlinger
+	Author: 		Elias Plank
 
-	Date: 15/01/2021
+	Date: 			2021-15-01
+
+	Last Modified:	2021-17-02 
 */
 
 namespace ppm {
 
-	struct Color {
+	struct color_s {
 
 		uint8_t r;
 		uint8_t g;
 		uint8_t b;
 
-		Color() : r(0), g(0), b(0) {}
-		Color(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+		color_s() : r(0), g(0), b(0) {}
+		color_s(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
 	};
 
-	typedef Color Pixel;
+	typedef color_s pixel_t;
 
-	static const Pixel
+	static const color_s
 		GREY(192, 192, 192), DARK_GREY(128, 128, 128), VERY_DARK_GREY(64, 64, 64),
 		RED(255, 0, 0), DARK_RED(128, 0, 0), VERY_DARK_RED(64, 0, 0),
 		YELLOW(255, 255, 0), DARK_YELLOW(128, 128, 0), VERY_DARK_YELLOW(64, 64, 0),
@@ -39,46 +40,62 @@ namespace ppm {
 		MAGENTA(255, 0, 255), DARK_MAGENTA(128, 0, 128), VERY_DARK_MAGENTA(64, 0, 64),
 		WHITE(255, 255, 255), BLACK(0, 0, 0), BLANK(0, 0, 0), BROWN(165, 100, 6), BELL(69, 4, 20);
 
-	class Image {
+	struct image_s {
 
-	public:
 		uint32_t width, height;
-		std::vector<std::vector<Pixel>> vImage;
+		const char* filename;
+		std::vector<std::vector<pixel_t>> image;
 
-		Image(uint32_t width, uint32_t height);
-		~Image();
+		image_s();
+		image_s(uint32_t width, uint32_t height);
+		~image_s();
 
-		void fill(Pixel color);
-		void drawRect(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Color color);
-		void drawCircle(uint32_t x, uint32_t y, uint32_t r, Color color);
-		void drawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Color color);
+		void set_dimensions(uint32_t width, uint32_t height);
+		void set_filename(const char* filename);
+
+		void fill(color_s color);
+		void draw_rect(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, color_s color);
+		void draw_circle(uint32_t x, uint32_t y, uint32_t r, color_s color);
+		void draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, color_s color);
+		void compile();
 		void compile(const char* filename);
 	};
 
-	Image::Image(uint32_t width, uint32_t height) {
+	image_s::image_s(uint32_t width, uint32_t height) {
 
 		this->height = height;
 		this->width = width;
 
 
-		vImage = std::vector<std::vector<Pixel>>(height, std::vector<Pixel>(width));
+		image = std::vector<std::vector<pixel_t>>(height, std::vector<pixel_t>(width));
 	}
 
-	Image::~Image() {
-		vImage.resize(0);
+	image_s::image_s(){
+		//standard constructor
+	}
+	image_s::~image_s() {
+		this->image.resize(0);
 	}
 
-	void Image::fill(Pixel color) {
+	void image_s::set_dimensions(uint32_t width, uint32_t height){
+		this->width = width;
+		this->height = height;
+	}
+	void image_s::set_filename(const char* filename){
+		this->filename = filename;
+	}
+
+	void image_s::fill(color_s color) {
 
 		for (uint32_t i = 0; i < this->height; i++) {
 			for (uint32_t j = 0; j < this->width; j++) {
-				this->vImage[i][j] = color;
+				this->image[i][j] = color;
 			}
 		}
 
 	}
 
-	void Image::drawRect(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Color color) {
+	void image_s::draw_rect(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, color_s color) {
 
 		if (x2 >= this->width) {
 			x2 = this->width - 1;
@@ -89,12 +106,12 @@ namespace ppm {
 
 		for (uint32_t i = y1; i < y2; i++) {
 			for (uint32_t j = x1; j < x2; j++) {
-				this->vImage[i][j] = color;
+				this->image[i][j] = color;
 			}
 		}
 	}
 
-	void Image::drawCircle(uint32_t x, uint32_t y, uint32_t r, Color color) {
+	void image_s::draw_circle(uint32_t x, uint32_t y, uint32_t r, color_s color) {
 
 		uint32_t xmin = ((int32_t)x - (int32_t)r < 0 ? 0 : (int32_t)x - (int32_t)r);
 		//uint32_t xmax = (x + r >= this->width ? this->width - 1 : x + r);
@@ -118,7 +135,7 @@ namespace ppm {
 				rp = hypot(_x, _y);
 
 				if (rp <= r) {
-					this->vImage[i][j] = color;
+					this->image[i][j] = color;
 
 					uint32_t di = (2 * _y) + i;
 					uint32_t dj = (2 * _x) + j;
@@ -131,15 +148,15 @@ namespace ppm {
 						dj = this->width - 1;
 					}
 
-					this->vImage[di][j] = color;
-					this->vImage[i][dj] = color;
-					this->vImage[di][dj] = color;
+					this->image[di][j] = color;
+					this->image[i][dj] = color;
+					this->image[di][dj] = color;
 				}
 			}
 		}
 	}
 
-	void Image::drawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Color color) {
+	void image_s::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, color_s color) {
 
 		int32_t dx, dy, p, x, y;
 
@@ -153,12 +170,12 @@ namespace ppm {
 
 		while (x < x2) {
 			if (p >= 0) {
-				this->vImage[y][x] = color;
+				this->image[y][x] = color;
 				y++;
 				p = p + 2 * dy - 2 * dx;
 			}
 			else {
-				this->vImage[y][x] = color;
+				this->image[y][x] = color;
 				p = p + 2 * dy;
 			}
 			x++;
@@ -166,7 +183,11 @@ namespace ppm {
 
 	}
 
-	void Image::compile(const char* filename) {
+	void image_s::compile(){
+		this->compile(this->filename);
+	}
+	
+	void image_s::compile(const char* filename) {
 
 		std::ofstream imageFileStream;
 
@@ -179,7 +200,7 @@ namespace ppm {
 
 			for (uint32_t i = 0; i < this->height; i++) {
 				for (uint32_t j = 0; j < this->width; j++) {
-					imageFileStream.write((char*)&this->vImage[i][j], sizeof(Pixel));
+					imageFileStream.write((char*)&this->image[i][j], sizeof(pixel_t));
 				}
 			}
 
