@@ -1,0 +1,44 @@
+#pragma once
+#include <iostream>
+
+struct color {
+
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    bool transparent;
+
+    color() {
+        this->r = 0;
+        this->g = 0;
+        this->b = 0;
+        this->transparent = false;
+    }
+
+    color(uint8_t r, uint8_t g, uint8_t b){
+
+        this->r = r;
+        this->g = g;
+        this->b = b;
+        this->transparent = false;
+    }
+
+    color(uint8_t r, uint8_t g, uint8_t b, bool transparent) : color(r, g, b) {
+        this->transparent = transparent;
+    }
+
+    bool operator == (color& r) {
+        
+        return (this->r == r.r && this->g == r.g && this->b == r.b);
+    }
+};
+
+static const color
+    GREY(192, 192, 192), DARK_GREY(128, 128, 128), VERY_DARK_GREY(64, 64, 64),
+    RED(255, 0, 0), DARK_RED(128, 0, 0), VERY_DARK_RED(64, 0, 0),
+    YELLOW(255, 255, 0), DARK_YELLOW(128, 128, 0), VERY_DARK_YELLOW(64, 64, 0),
+    GREEN(0, 255, 0), DARK_GREEN(0, 128, 0), VERY_DARK_GREEN(0, 64, 0),
+    CYAN(0, 255, 255), DARK_CYAN(0, 128, 128), VERY_DARK_CYAN(0, 64, 64),
+    BLUE(0, 0, 255), DARK_BLUE(0, 0, 128), VERY_DARK_BLUE(0, 0, 64),
+    MAGENTA(255, 0, 255), DARK_MAGENTA(128, 0, 128), VERY_DARK_MAGENTA(64, 0, 64),
+    WHITE(255, 255, 255), BLACK(0, 0, 0), BLANK(0, 0, 0, true), BROWN(165, 100, 6), PINK(255, 0, 255);
